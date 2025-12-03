@@ -16,6 +16,8 @@
     "@tanstack/react-virtual": "^3.13.12",
     "astro": "^5.14.7",
     "react": "^18.3.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
     "tinacms": "^2.9.0"

@@ -1,0 +1,30 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content";
+import client from "../../../tina/__generated__/client";
+import WorkLayout from "../../layouts/WorkLayout.astro";
+import AdminWork from "../../../tina/pages/AdminWork";
+
+export async function getStaticPaths() {
+	const works = await getCollection("work");
+	console.log('getStaticPath', works);
+	return works.map((work) => ({
+		params: { slug: work.id },
+		props: {
+			work,
+			getTinaProps: async () =>
+				client.queries.work({
+					relativePath: work.data.tinaInfo.relativePath,
+				}),
+		},
+	}));
+}
+
+const { getTinaProps } = Astro.props;
+const tinaProps = await getTinaProps();
+
+---
+
+
+<WorkLayout {...tinaProps}>
+	<AdminWork {...tinaProps} client:tina/>
+</WorkLayout>

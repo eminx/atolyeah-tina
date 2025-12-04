@@ -1,7 +1,7 @@
 import { defineCollection, z } from "astro:content";
 import client from "../tina/__generated__/client";
 
-const blog = defineCollection({
+export const blog = defineCollection({
   loader: async () => {
     const postsResponse = await client.queries.blogConnection();
 
@@ -33,7 +33,7 @@ const blog = defineCollection({
   }),
 });
 
-const page = defineCollection({
+export const page = defineCollection({
   loader: async () => {
     const postsResponse = await client.queries.pageConnection();
 
@@ -60,5 +60,36 @@ const page = defineCollection({
     seoTitle: z.string(),
     body: z.any(),
   }),
-})
-export const collections = { blog, page };
+});
+
+export const work = defineCollection({
+  loader: async () => {
+    const worksResponse = await client.queries.workConnection();
+
+    // Map Tina posts to the correct format for Astro
+    return worksResponse.data.workConnection.edges
+      ?.filter((work) => !!work)
+      .map((work) => {
+        const node = work?.node;
+
+        return {
+          ...node,
+          id: node?._sys.relativePath.replace(/\.mdx?$/, ""), // Generate clean URLs
+          tinaInfo: node?._sys, // Include Tina system info if needed
+        };
+      });
+  },
+  schema: z.object({
+    tinaInfo: z.object({
+      filename: z.string(),
+      basename: z.string(),
+      path: z.string(),
+      relativePath: z.string(),
+    }),
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    heroImage: z.string().nullish(),
+  }),
+});
